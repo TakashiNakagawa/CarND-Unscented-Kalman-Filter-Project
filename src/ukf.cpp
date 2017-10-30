@@ -18,7 +18,7 @@ UKF::UKF() {
   x_ = VectorXd(5);
 
   // initial covariance matrix
-  P_ = MatrixXd(5, 5);
+  P_ = MatrixXd::Identity(n_x_,n_x_);
 
   // Process noise standard deviation longitudinal acceleration in m/s^2
   std_a_ = 1;
@@ -48,9 +48,6 @@ UKF::UKF() {
 
   Hint: one or more values initialized above might be wildly off...
   */
-  n_x_ = 5;
-  n_aug_ = 7;
-  lambda_ = 3 - n_aug_;
 
   Xsig_pred_ = MatrixXd(n_x_, 2 * n_aug_ + 1);
   weights_ = VectorXd(2*n_aug_+1);
@@ -58,7 +55,6 @@ UKF::UKF() {
   for (int i=1; i<2*n_aug_+1; i++) {  //2n+1 weights
     weights_(i) = 0.5/(n_aug_+lambda_);
   }
-  P_ = MatrixXd::Identity(n_x_,n_x_);
 }
 
 UKF::~UKF() {}
