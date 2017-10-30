@@ -105,6 +105,7 @@ public:
   
 private:
   void NormalizeAngle(double& angle);
+  void Initialize(const MeasurementPackage& meas_package);
 };
 
 #endif /* UKF_H */

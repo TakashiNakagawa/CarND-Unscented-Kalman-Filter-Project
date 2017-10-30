@@ -59,6 +59,29 @@ UKF::UKF() {
 
 UKF::~UKF() {}
 
+void UKF::Initialize(const MeasurementPackage& meas_package)
+{
+  x_ = VectorXd::Zero(n_x_);
+  auto& px = x_(0);
+  auto& py = x_(1);
+  switch (meas_package.sensor_type_) {
+    case MeasurementPackage::LASER:
+      px = meas_package.raw_measurements_(0);
+      py = meas_package.raw_measurements_(1);
+      break;
+    case MeasurementPackage::RADAR:
+    {
+      float rho = meas_package.raw_measurements_(0);
+      float phi = meas_package.raw_measurements_(1);
+      px = rho * cos(phi);
+      py = rho * sin(phi);
+      break;
+    }
+    default:
+      break;
+  }
+  time_us_ = meas_package.timestamp_;
+}
 /**
  * @param {MeasurementPackage} meas_package The latest measurement data of
  * either radar or laser.
@@ -71,21 +94,7 @@ void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
   measurements.
   */
   if(!is_initialized_){
-    x_ = VectorXd(n_x_);
-    x_ << 0,0,0,0,0;
-    auto& px = x_(0);
-    auto& py = x_(1);
-    if(meas_package.sensor_type_ == MeasurementPackage::LASER){
-      px = meas_package.raw_measurements_(0);
-      py = meas_package.raw_measurements_(1);
-    }else if(meas_package.sensor_type_ == MeasurementPackage::RADAR){
-      float rho = meas_package.raw_measurements_(0);
-      float phi = meas_package.raw_measurements_(1);
-      px = rho * cos(phi);
-      py = rho * sin(phi);
-    }
-
-    time_us_ = meas_package.timestamp_;
+    Initialize(meas_package);
     is_initialized_ = true;
     return;
   }
